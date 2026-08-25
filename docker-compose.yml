@@ -1,0 +1,81 @@
+services:
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: mypouch-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html
+      - ./Docker/Nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    networks:
+      - mypouch
+
+  php:
+    build:
+      context: ./Docker/PHP
+      dockerfile: Dockerfile
+    container_name: mypouch-php
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - mysql
+      - opensearch
+      - redis
+    networks:
+      - mypouch
+
+  mysql:
+    image: mysql:8.4
+    container_name: mypouch-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: magento
+      MYSQL_USER: magento
+      MYSQL_PASSWORD: magento
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - mypouch
+
+  opensearch:
+    image: opensearchproject/opensearch:2.19.3
+    container_name: mypouch-opensearch
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+      - DISABLE_SECURITY_PLUGIN=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - mypouch
+
+  redis:
+    image: redis:7-alpine
+    container_name: mypouch-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - mypouch
+
+volumes:
+  mysql_data:
+  opensearch_data:
+  redis_data:
+
+networks:
+  mypouch:
+    driver: bridge
