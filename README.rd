@@ -66,3 +66,23 @@ open and root
     --repository-url=https://repo.magento.com/ \
     magento/project-community-edition=2.4.8-p3 \
     .
+
+
+
+
+
+
+
+
+
+
+
+
+check composer 
+    - docker compose ps
+check php and composer
+    - docker compose exec php php -v
+check composer version
+    - docker compose exec php composer --version
+tes Nginx 
+    - docker compose run --rm nginx nginx -t

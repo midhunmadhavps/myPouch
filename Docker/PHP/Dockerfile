@@ -21,13 +21,14 @@ RUN apt-get update && apt-get install -y \
         ctype \
         curl \
         dom \
- 	ftp \
+ 	    ftp \
         gd \
         intl \
         mbstring \
         mysqli \
         pdo_mysql \
         soap \
+        sockets \
         xsl \
         zip \
     && rm -rf /var/lib/apt/lists/*

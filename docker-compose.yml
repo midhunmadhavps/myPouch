@@ -31,14 +31,14 @@ services:
     image: mysql:8.4
     container_name: mypouch-mysql
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: magento
-      MYSQL_USER: magento
-      MYSQL_PASSWORD: magento
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
-      - "3306:3306"
+      - "${MYSQL_PORT}:3306"
     networks:
       - mypouch
 
@@ -57,7 +57,7 @@ services:
     volumes:
       - opensearch_data:/usr/share/opensearch/data
     ports:
-      - "9200:9200"
+      - "${OPENSEARCH_PORT}:9200"
     networks:
       - mypouch
 
@@ -65,7 +65,7 @@ services:
     image: redis:7-alpine
     container_name: mypouch-redis
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT}:6379"
     volumes:
       - redis_data:/data
     networks:
