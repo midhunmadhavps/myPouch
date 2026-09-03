@@ -1,5 +1,12 @@
 FROM php:8.3-fpm
 
+RUN echo "memory_limit=2G" > /usr/local/etc/php/conf.d/memory-limit.ini
+
+RUN echo "opcache.memory_consumption=256" > /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.interned_strings_buffer=32" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.max_accelerated_files=30000" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.revalidate_freq=2" >> /usr/local/etc/php/conf.d/opcache.ini
+
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -21,7 +28,7 @@ RUN apt-get update && apt-get install -y \
         ctype \
         curl \
         dom \
- 	    ftp \
+        ftp \
         gd \
         intl \
         mbstring \

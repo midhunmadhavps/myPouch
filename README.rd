@@ -68,16 +68,6 @@ open and root
     .
 
 
-
-
-
-
-
-
-
-
-
-
 check composer 
     - docker compose ps
 check php and composer
@@ -86,3 +76,16 @@ check composer version
     - docker compose exec php composer --version
 tes Nginx 
     - docker compose run --rm nginx nginx -t
+
+
+PHP 8.3.33
+Magento CLI 2.4.8-p3
+
+connect the musql
+    - docker compose exec mysql mysql -u root -p
+
+docker compose exec php bin/magento setup:install --base-url=http://localhost:8080/ --db-host=mysql --db-name=myPouch --db-user=root --db-password='initial#01' --admin-firstname=Admin --admin-lastname=User --admin-email=admin@example.com --admin-user=admin --admin-password='Admin123456!' --language=en_US --currency=USD --timezone=Asia/Kolkata --use-rewrites=1
+
+while file permission issues
+
+docker compose exec php sh -c "mkdir -p var/page_cache var/cache var/log generated pub/static pub/media && chmod -R 777 var generated pub/static pub/media"
