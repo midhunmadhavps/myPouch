@@ -89,3 +89,23 @@ docker compose exec php bin/magento setup:install --base-url=http://localhost:80
 while file permission issues
 
 docker compose exec php sh -c "mkdir -p var/page_cache var/cache var/log generated pub/static pub/media && chmod -R 777 var generated pub/static pub/media"
+
+http://localhost:8080/admin_fp72ohu
+    Username: admin
+    Password: Admin123456!
+
+cmds
+docker compose exec php bin/magento setup:upgrade
+docker compose exec php bin/magento setup:di:compile
+docker compose exec php bin/magento setup:static-content:deploy -f en_US
+docker compose exec php bin/magento cache:flush
+docker compose restart php nginx
+docker compose exec php bin/magento cache:status
+docker compose exec php bin/magento indexer:reindex
+
+docker compose exec php bin/magento module:disable Magento_AdminAdobeImsTwoFactorAuth Magento_TwoFactorAuth
+
+docker compose exec php bin/magento info:adminuri
+docker compose logs --tail=100 php
+docker compose exec php sh -c "tail -100 var/log/system.log"
+docker compose exec php sh -c "tail -100 var/log/exception.log"
