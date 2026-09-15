@@ -1,13 +1,15 @@
 services:
 
   nginx:
-    image: nginx:1.27-alpine
+    image: nginx:1.30-alpine
     container_name: mypouch-nginx
     ports:
       - "8080:80"
     volumes:
       - ./src:/var/www/html
       - ./Docker/Nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - magento_static:/var/www/html/pub/static
+      - magento_media:/var/www/html/pub/media
     depends_on:
       - php
     networks:
@@ -20,15 +22,21 @@ services:
     container_name: mypouch-php
     volumes:
       - ./src:/var/www/html
+      - magento_var:/var/www/html/var
+      - magento_generated:/var/www/html/generated
+      - magento_static:/var/www/html/pub/static
+      - magento_media:/var/www/html/pub/media
     depends_on:
       - mysql
       - opensearch
-      - redis
+      - valkey
+      - rabbitmq
     networks:
       - mypouch
 
   mysql:
     image: mysql:8.4
+    command: --log-bin-trust-function-creators=1
     container_name: mypouch-mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -43,7 +51,7 @@ services:
       - mypouch
 
   opensearch:
-    image: opensearchproject/opensearch:2.19.3
+    image: opensearchproject/opensearch:3
     container_name: mypouch-opensearch
     environment:
       - discovery.type=single-node
@@ -61,20 +69,37 @@ services:
     networks:
       - mypouch
 
-  redis:
-    image: redis:7-alpine
-    container_name: mypouch-redis
-    ports:
-      - "${REDIS_PORT}:6379"
+  valkey:
+    image: valkey/valkey:9
+    container_name: mypouch-valkey
     volumes:
-      - redis_data:/data
+      - valkey_data:/data
+    networks:
+      - mypouch
+
+  rabbitmq:
+    image: rabbitmq:4.3-management
+    container_name: mypouch-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "${RABBITMQ_PORT}:5672"
+      - "${RABBITMQ_MANAGEMENT_PORT}:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - mypouch
 
 volumes:
   mysql_data:
   opensearch_data:
-  redis_data:
+  valkey_data:
+  rabbitmq_data:
+  magento_var:
+  magento_generated:
+  magento_static:
+  magento_media:
 
 networks:
   mypouch:
